@@ -11,15 +11,7 @@ fn run(input: &str) -> i64 {
         let end = blah.1.parse::<i64>().unwrap();
 
         'outer: for id in start..=end {
-            if id < 11 {
-                continue;
-            }
-
             let number = id.to_string();
-            if number.trim_matches(number.chars().nth(0).unwrap()).len() == 0 {
-                acc += id;
-                continue 'outer;
-            }
 
             for i in 1..number.len() {
                 let split = number.split_at(i);
