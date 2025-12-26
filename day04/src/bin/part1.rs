@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::HashSet;
 
 fn main() {
     let input = include_str!("../../input.txt");
@@ -6,25 +6,28 @@ fn main() {
 }
 
 fn run(input: &str) -> i32 {
-    let grid_dimensions = (input.find("\n").unwrap(), input.matches("\n").count() + 1);
-    let mut grid = HashMap::with_capacity(grid_dimensions.0.strict_mul(grid_dimensions.1));
+    let mut pallet = HashSet::new();
 
     let _ = input
         .lines()
         .enumerate()
-        .map(|y| {
-            y.1.trim()
+        .map(|line| {
+            let (y, row) = line;
+            row.trim()
                 .chars()
                 .enumerate()
-                .map(|x| {
-                    grid.insert((x.0 as i32, y.0 as i32), x.1);
+                .map(|char| {
+                    let (x, roll) = char;
+                    if roll == '@' {
+                        pallet.insert((x as i32, y as i32));
+                    }
                 })
                 .collect::<Vec<_>>()
         })
         .collect::<Vec<_>>();
 
-    grid.iter().fold(0, |rolls, square| {
-        if *square.1 == '@' && is_accessible(*square.0, &grid) {
+    pallet.iter().fold(0, |rolls, position| {
+        if is_accessible(*position, &pallet) {
             rolls + 1
         } else {
             rolls
@@ -32,27 +35,29 @@ fn run(input: &str) -> i32 {
     })
 }
 
-fn is_accessible(square: (i32, i32), grid: &HashMap<(i32, i32), char>) -> bool {
-    let squares = vec![
-        (square.0, square.1 + 1),
-        (square.0, square.1 - 1),
-        (square.0 - 1, square.1 + 1),
-        (square.0 - 1, square.1),
-        (square.0 - 1, square.1 - 1),
-        (square.0 + 1, square.1 + 1),
-        (square.0 + 1, square.1),
-        (square.0 + 1, square.1 - 1),
+fn is_accessible(coordinates: (i32, i32), pallet: &HashSet<(i32, i32)>) -> bool {
+    let (x, y) = coordinates;
+
+    let neighbours = [
+        (x, y + 1),
+        (x, y - 1),
+        (x - 1, y + 1),
+        (x - 1, y),
+        (x - 1, y - 1),
+        (x + 1, y + 1),
+        (x + 1, y),
+        (x + 1, y - 1),
     ];
 
-    let dots = squares.iter().fold(0, |dots, square| {
-        if grid.get(square).is_none_or(|x| *x == '.') {
-            dots + 1
+    let rolls = neighbours.iter().fold(0, |rolls, neighbour| {
+        if pallet.get(neighbour).is_some() {
+            rolls + 1
         } else {
-            dots
+            rolls
         }
     });
 
-    dots > 4
+    rolls < 4
 }
 
 #[cfg(test)]
