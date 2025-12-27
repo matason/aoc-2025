@@ -35,9 +35,7 @@ fn run(input: &str) -> i32 {
     })
 }
 
-fn is_accessible(coordinates: (i32, i32), pallet: &HashSet<(i32, i32)>) -> bool {
-    let (x, y) = coordinates;
-
+fn is_accessible((x, y): (i32, i32), pallet: &HashSet<(i32, i32)>) -> bool {
     let neighbours = [
         (x, y + 1),
         (x, y - 1),
