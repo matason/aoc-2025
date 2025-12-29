@@ -3,25 +3,25 @@ fn main() {
     println!("{}", run(input.trim()))
 }
 
-fn run(input: &str) -> i32 {
+fn run(input: &str) -> usize {
     let (ranges, ingredients) = input.split_once("\n\n").unwrap();
     let mut database: Vec<(i64, i64)> = Vec::new();
 
-    let _ = ranges
-        .lines()
-        .map(|range| {
-            let (start, end) = range.split_once("-").unwrap();
-            database.push((start.parse::<i64>().unwrap(), end.parse::<i64>().unwrap()));
-        })
-        .collect::<Vec<_>>();
+    for range in ranges.lines() {
+        let (start, end) = range.split_once("-").unwrap();
+        database.push((start.parse::<i64>().unwrap(), end.parse::<i64>().unwrap()));
+    }
 
-    ingredients.lines().fold(0, |fresh, ingredient| {
-        let found = database.iter().any(|(start, end)| {
-            ingredient.parse::<i64>().unwrap() >= *start
-                && ingredient.parse::<i64>().unwrap() <= *end
-        });
-        if found { fresh + 1 } else { fresh }
-    })
+    ingredients
+        .lines()
+        .filter_map(|ingredient| {
+            ingredient.parse::<i64>().ok().filter(|ingredient| {
+                database
+                    .iter()
+                    .any(|(start, end)| ingredient >= start && ingredient <= end)
+            })
+        })
+        .count()
 }
 
 #[cfg(test)]
