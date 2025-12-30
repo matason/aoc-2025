@@ -14,12 +14,11 @@ fn run(input: &str) -> usize {
 
     ingredients
         .lines()
-        .filter_map(|ingredient| {
-            ingredient.parse::<i64>().ok().filter(|ingredient| {
-                database
-                    .iter()
-                    .any(|(start, end)| ingredient >= start && ingredient <= end)
-            })
+        .filter_map(|ingredient| ingredient.parse::<i64>().ok())
+        .filter(|ingredient| {
+            database
+                .iter()
+                .any(|(start, end)| ingredient >= start && ingredient <= end)
         })
         .count()
 }
